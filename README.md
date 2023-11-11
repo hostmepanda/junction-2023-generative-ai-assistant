@@ -10,3 +10,6 @@ Track: Sustainable generative AI assistant for insights
 - [@hostmepanda](https://github.com/hostmepanda)
 - [@mrfishchev](https://github.com/mrfishchev)
 - [@zagyar](https://github.com/zagyar)
+
+## Repos links
+- T5 model fetcher and launcher, text summarisation [https://github.com/hostmepanda/junction-2023-deploy-from-hugging-face](https://github.com/hostmepanda/junction-2023-deploy-from-hugging-face)
