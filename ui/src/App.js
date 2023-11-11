@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import { AppBar, Box, TextField, IconButton, Paper, Stack, Typography, Toolbar } from '@mui/material';
 import {Send} from '@mui/icons-material';
@@ -28,7 +28,23 @@ const theme = createTheme({
 });
 
 function App() {
-  console.log(theme)
+  const [responseContent, setResponseContent] = useState([{ content: 'Some example of summarised stuff', id: 1 }]);
+  const [userPromt, setUserPrompt] = useState('');
+  const [isMetaPressed, setIsMetaPressed] = useState(false);
+
+  const sendButtonOnClick = () => {
+    if (userPromt.trim().length > 0) {
+      setUserPrompt('')
+      setResponseContent([
+        ...responseContent,
+        { content: userPromt, id: new Date().valueOf() },
+      ])
+    }
+  }
+
+  const onPromptEnter = ({ target: { value: enteredPrompt } }) => {
+    setUserPrompt(enteredPrompt)
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -42,7 +58,29 @@ function App() {
 
       <div className="App">
         <Stack direction={'column'}>
-
+          {responseContent.map(({ content, id }, index) => {
+            return (
+              <Paper
+                key={id ?? index}
+                style={{
+                  backgroundColor: theme.palette.secondary.light,
+                }}
+                component="form"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flex: 1,
+                  paddingBottom: 3,
+                  paddingTop: '10px',
+                  paddingLeft: '10px',
+                  paddingRight: '10px',
+                  marginTop: 1,
+                }}
+              >
+                <Typography>{content}</Typography>
+              </Paper>
+            )
+          })}
         </Stack>
         <Box
           component="form"
@@ -70,8 +108,34 @@ function App() {
               label="Multiline Prompt"
               placeholder="What is the stil manufacturing tonnage in Finland in 2025"
               multiline
+              onChange={onPromptEnter}
+              value={userPromt}
+              onKeyPress={(ev) => {
+                if (ev.key === 'Meta') {
+                  setIsMetaPressed(true);
+                } else if (ev.key === 'Enter' && isMetaPressed) {
+                  sendButtonOnClick()
+                } else {
+                  setIsMetaPressed(false);
+                }
+              }}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Meta') {
+                  setIsMetaPressed(true);
+                } else if (ev.key === 'Enter' && isMetaPressed) {
+                  sendButtonOnClick()
+                } else {
+                  setIsMetaPressed(false);
+                }
+              }}
             />
-            <IconButton size={'large'} color="primary" sx={{ p: '10px' }} aria-label="directions">
+            <IconButton
+              size={'large'}
+              color="primary"
+              sx={{ p: '10px' }}
+              aria-label="directions"
+              onClick={sendButtonOnClick}
+            >
               <Send />
             </IconButton>
           </Paper>
