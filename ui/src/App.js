@@ -28,7 +28,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [responseContent, setResponseContent] = useState([{ content: 'Some example of summarised stuff', id: 1 }]);
+  const [responseContent, setResponseContent] = useState([]);
   const [userPromt, setUserPrompt] = useState('');
   const [isMetaPressed, setIsMetaPressed] = useState(false);
 
