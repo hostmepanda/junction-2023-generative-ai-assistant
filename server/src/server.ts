@@ -4,15 +4,16 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 
 const APP_LISTEN_PORT =4000;
-
 const app = express();
+const corsOpts = {
+  origin: '*'
+};
+
 app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-  }
+  cors: corsOpts,
 });
 
 io.on('connection', (socket) => {
