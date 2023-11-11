@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import socketIOClient from "socket.io-client";
 
 import { AppBar, Box, TextField, IconButton, Paper, Stack, Typography, Toolbar } from '@mui/material';
 import {Send} from '@mui/icons-material';
@@ -45,6 +46,13 @@ function App() {
   const onPromptEnter = ({ target: { value: enteredPrompt } }) => {
     setUserPrompt(enteredPrompt)
   }
+
+  useEffect(() => {
+    const socket = socketIOClient('http://127.0.0.1:4000');
+    socket.on("FromAPI", data => {
+      console.log(data);
+    });
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

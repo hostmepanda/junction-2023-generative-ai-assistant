@@ -1,13 +1,29 @@
 import express from 'express';
+import * as http from "http";
+import { Server } from 'socket.io';
+import cors from 'cors';
 
-const APP_LISTEN_PORT =4000
+const APP_LISTEN_PORT =4000;
 
 const app = express();
+app.use(cors());
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('Socket: incoming connection');
+  socket.on("disconnect", () => console.log("Client disconnected"));
+})
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+  res.send('Hello World!');
+});
 
-app.listen(APP_LISTEN_PORT, () => {
-  console.log(`App is started on port: ${APP_LISTEN_PORT}`)
-})
+server.listen(APP_LISTEN_PORT, () => {
+  console.log(`App is started on port: ${APP_LISTEN_PORT}`);
+});
