@@ -32,14 +32,16 @@ function App() {
   const [responseContent, setResponseContent] = useState([]);
   const [userPromt, setUserPrompt] = useState('');
   const [isMetaPressed, setIsMetaPressed] = useState(false);
+  const [socketConnection, setSocketConnection] = useState();
 
-  const sendButtonOnClick = () => {
+  const sendButtonOnClick = async () => {
     if (userPromt.trim().length > 0) {
-      setUserPrompt('')
+      setUserPrompt('');
       setResponseContent([
         ...responseContent,
         { content: userPromt, id: new Date().valueOf() },
-      ])
+      ]);
+      await socketConnection.emit('user-entered-prompt', { userPromt });
     }
   }
 
@@ -48,11 +50,16 @@ function App() {
   }
 
   useEffect(() => {
-    const socket = socketIOClient('http://127.0.0.1:4000');
-    socket.on("FromAPI", data => {
-      console.log(data);
-    });
-  }, []);
+    if (!socketConnection) {
+      const socket = socketIOClient('http://127.0.0.1:4000');
+      socket.on('user-entered-prompt-accepted', data => {
+        console.log('--user-entered-prompt-accepted', data);
+      }).on('user-entered-prompt-failed', data => {
+        console.log('--user-entered-prompt-failed', data);
+      });
+      setSocketConnection(socket);
+    }
+  }, [socketConnection]);
 
   return (
     <ThemeProvider theme={theme}>
