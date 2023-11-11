@@ -49,6 +49,13 @@ function App() {
     setUserPrompt(enteredPrompt)
   }
 
+  const pushToContent = (content) => {
+    setResponseContent([
+      ...responseContent,
+      { content, id: new Date().valueOf() },
+    ]);
+  }
+
   useEffect(() => {
     if (!socketConnection) {
       const socket = socketIOClient('http://127.0.0.1:4000');
@@ -56,10 +63,13 @@ function App() {
         console.log('--user-entered-prompt-accepted', data);
       }).on('user-entered-prompt-failed', data => {
         console.log('--user-entered-prompt-failed', data);
+      }).on('summary-response-received', ({ summary }) => {
+        console.log('--responseContent', responseContent);
+        pushToContent(summary);
       });
       setSocketConnection(socket);
     }
-  }, [socketConnection]);
+  }, [socketConnection, responseContent]);
 
   return (
     <ThemeProvider theme={theme}>

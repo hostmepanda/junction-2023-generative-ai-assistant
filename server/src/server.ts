@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import * as http from "http";
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -15,6 +16,7 @@ const corsOpts = {
 };
 
 app.use(cors());
+app.use(bodyParser.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -27,13 +29,13 @@ io
     socket
       .on("disconnect", () => console.log("Client disconnected"))
       .on('user-entered-prompt', async ({ userPromt: prompt }) => {
-        console.log('New prompt has been received from user', {prompt});
+        console.log('New prompt has been received from user', {prompt, socketId: socket.id});
         try {
           await axios.post(
             CHAT_ENDPOINT,
             {
               prompt,
-              callback: `${BASE_APP}/callback/${1}`,
+              callback: `${BASE_APP}/callback/${socket.id}`,
             },
             {
               headers: {
@@ -52,13 +54,18 @@ io
       });
   })
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
 app.post('/callback/:uid', (req, res, next) => {
   const { uid } = req.params;
+  const { prompt } = req?.body ?? {};
+  res.sendStatus(200);
 
+  // @ts-ignore
+  const socket = io.sockets.sockets.get(uid);
+  if (!socket) {
+    return console.error('No socket can be found by id', {uid});
+  }
+
+  socket.emit('summary-response-received', { summary: prompt });
 })
 
 server.listen(APP_LISTEN_PORT, () => {
